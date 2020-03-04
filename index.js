@@ -6,6 +6,10 @@ const schema = require("./schema/schema");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config();
+const cors = require("cors");
+
+//allow cross origin req
+app.use(cors);
 
 //connect to mlab database
 console.log("environment pass ----------------_>", process.env.MONGO_DB_PASS);
