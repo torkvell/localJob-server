@@ -13,11 +13,3 @@ Detailed user stories:
 - As a company I want to be able to contact the user which posted the job
 
 Database modelling:
-
-Planned DB model:
-
-![ER diagram planned](https://github.com/torkvell/localJob-Server/blob/master/pictures/ER-diagram-localJob-planned.png)
-
-Realised DB model:
-
-![ER diagram realised](https://github.com/torkvell/localJob-Server/blob/master/pictures/ERD-localJob-realised.png)
