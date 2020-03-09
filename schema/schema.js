@@ -129,6 +129,7 @@ const Mutations = new GraphQLObjectType({
         let user = new User({
           name: args.name,
           email: args.email,
+          country: args.country,
           password: args.password,
           jobless: args.jobless
         });
