@@ -3,6 +3,7 @@ const User = require("../models/user");
 const Message = require("../models/message");
 const JobCategory = require("../models/jobCategory");
 const Job = require("../models/job");
+const { bcrypt, compare } = require("bcrypt");
 
 const {
   GraphQLObjectType,
@@ -126,14 +127,33 @@ const Mutations = new GraphQLObjectType({
         jobless: { type: new GraphQLNonNull(GraphQLBoolean) }
       },
       resolve(parent, args) {
+        const saltRounds = 10;
+        const hashedPassword = bcrypt.hash(args.password, saltRounds);
         let user = new User({
           name: args.name,
           email: args.email,
-          password: args.password,
+          password: hashedPassword,
           jobless: args.jobless
         });
         //done by mongoose
         return user.save();
+      }
+    },
+    login: {
+      type: UserType,
+      args: {
+        email: { type: new GraphQLNonNull(GraphQLString) },
+        password: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve(parent, args) {
+        const user = User.find({ email: args.email });
+        if (!user) {
+          throw new Error("Could not find user");
+        }
+        const valid = compare(args.password, user.password);
+        if (!valid) {
+          throw new Error("Password invalid");
+        }
       }
     },
     addJob: {
