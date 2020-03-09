@@ -24,9 +24,6 @@ const UserType = new GraphQLObjectType({
     email: { type: GraphQLString },
     password: { type: GraphQLString },
     country: { type: GraphQLString },
-    city: { type: GraphQLString },
-    postalCode: { type: GraphQLString },
-    address: { type: GraphQLString },
     jobless: { type: GraphQLBoolean },
     jobs: {
       type: new GraphQLList(JobType),
@@ -54,6 +51,10 @@ const JobType = new GraphQLObjectType({
     price: { type: GraphQLInt },
     pictures: { type: GraphQLString },
     userId: { type: GraphQLID },
+    country: { type: GraphQLString },
+    city: { type: GraphQLString },
+    postalCode: { type: GraphQLString },
+    address: { type: GraphQLString },
     jobCategoryId: { type: GraphQLID },
     jobCategory: {
       type: JobCategoryType,
@@ -154,6 +155,10 @@ const Mutations = new GraphQLObjectType({
         if (!valid) {
           throw new Error("Password invalid");
         }
+        //login successfull
+        return {
+          accessToken: ""
+        };
       }
     },
     addJob: {
