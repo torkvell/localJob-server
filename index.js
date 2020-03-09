@@ -9,17 +9,17 @@ dotenv.config();
 const cors = require("cors");
 
 //allow cross origin req
-app.use(cors);
+app.use(cors());
 
-//connect to mlab database
-console.log("environment pass ----------------_>", process.env.MONGO_DB_PASS);
+//connect to mongo database
 mongoose.connect(
-  `mongodb+srv://toralf:${process.env.MONGO_DB_PASS}@cluster0-3zp7l.mongodb.net/test?retryWrites=true&w=majority`,
+  `mongodb+srv://torkvell:${process.env.MONGO_DB_PASS}@cluster0-bpl2o.mongodb.net/test?retryWrites=true&w=majority`,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true
   }
 );
+
 mongoose.connection.once("open", () => {
   console.log("connected to mongo database");
 });
