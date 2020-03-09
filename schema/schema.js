@@ -123,9 +123,6 @@ const Mutations = new GraphQLObjectType({
         email: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: new GraphQLNonNull(GraphQLString) },
         country: { type: new GraphQLNonNull(GraphQLString) },
-        city: { type: new GraphQLNonNull(GraphQLString) },
-        postalCode: { type: new GraphQLNonNull(GraphQLString) },
-        address: { type: new GraphQLNonNull(GraphQLString) },
         jobless: { type: new GraphQLNonNull(GraphQLBoolean) }
       },
       resolve(parent, args) {
@@ -133,10 +130,6 @@ const Mutations = new GraphQLObjectType({
           name: args.name,
           email: args.email,
           password: args.password,
-          country: args.country,
-          city: args.city,
-          postalCode: args.postalCode,
-          address: args.address,
           jobless: args.jobless
         });
         //done by mongoose
@@ -150,6 +143,10 @@ const Mutations = new GraphQLObjectType({
         description: { type: new GraphQLNonNull(GraphQLString) },
         price: { type: new GraphQLNonNull(GraphQLInt) },
         pictures: { type: GraphQLString },
+        country: { type: new GraphQLNonNull(GraphQLString) },
+        city: { type: new GraphQLNonNull(GraphQLString) },
+        postalCode: { type: new GraphQLNonNull(GraphQLString) },
+        address: { type: new GraphQLNonNull(GraphQLString) },
         userId: { type: new GraphQLNonNull(GraphQLID) },
         jobCategoryId: { type: new GraphQLNonNull(GraphQLID) }
       },
@@ -159,6 +156,10 @@ const Mutations = new GraphQLObjectType({
           description: args.description,
           price: args.price,
           pictures: args.pictures,
+          country: args.country,
+          city: args.city,
+          postalCode: args.postalCode,
+          address: args.address,
           userId: args.userId,
           jobCategoryId: args.jobCategoryId
         });
