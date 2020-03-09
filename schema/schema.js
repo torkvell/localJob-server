@@ -23,9 +23,6 @@ const UserType = new GraphQLObjectType({
     email: { type: GraphQLString },
     password: { type: GraphQLString },
     country: { type: GraphQLString },
-    city: { type: GraphQLString },
-    postalCode: { type: GraphQLString },
-    address: { type: GraphQLString },
     jobless: { type: GraphQLBoolean },
     jobs: {
       type: new GraphQLList(JobType),
@@ -52,6 +49,10 @@ const JobType = new GraphQLObjectType({
     description: { type: GraphQLString },
     price: { type: GraphQLInt },
     pictures: { type: GraphQLString },
+    country: { type: GraphQLString },
+    city: { type: GraphQLString },
+    postalCode: { type: GraphQLString },
+    address: { type: GraphQLString },
     userId: { type: GraphQLID },
     jobCategoryId: { type: GraphQLID },
     jobCategory: {
@@ -129,6 +130,7 @@ const Mutations = new GraphQLObjectType({
         let user = new User({
           name: args.name,
           email: args.email,
+          country: args.country,
           password: args.password,
           jobless: args.jobless
         });
