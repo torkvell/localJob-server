@@ -3,7 +3,9 @@ const User = require("../models/user");
 const Message = require("../models/message");
 const JobCategory = require("../models/jobCategory");
 const Job = require("../models/job");
-const { bcrypt, compare } = require("bcrypt");
+const { compare } = require("bcrypt");
+const bcrypt = require("bcrypt");
+const { toJWT } = require("../auth/jwt");
 
 const {
   GraphQLObjectType,
@@ -39,6 +41,18 @@ const UserType = new GraphQLObjectType({
         return Message.find({ toUserId: parent.id });
       }
     }
+  })
+});
+
+const UserLoginType = new GraphQLObjectType({
+  name: "UserLogin",
+  fields: () => ({
+    id: { type: GraphQLID },
+    name: { type: GraphQLString },
+    email: { type: GraphQLString },
+    country: { type: GraphQLString },
+    jobless: { type: GraphQLString },
+    token: { type: GraphQLString }
   })
 });
 
@@ -129,36 +143,48 @@ const Mutations = new GraphQLObjectType({
       },
       resolve(parent, args) {
         const saltRounds = 10;
-        const hashedPassword = bcrypt.hash(args.password, saltRounds);
-        let user = new User({
-          name: args.name,
-          email: args.email,
-          password: hashedPassword,
-          jobless: args.jobless
+        bcrypt.hash(args.password, saltRounds).then(hashedPassword => {
+          // Store hash in your password DB.
+          console.log(hashedPassword);
+          let user = new User({
+            name: args.name,
+            email: args.email,
+            password: hashedPassword,
+            country: args.country,
+            jobless: args.jobless
+          });
+          //done by mongoose
+          return user.save();
         });
-        //done by mongoose
-        return user.save();
       }
     },
     login: {
-      type: UserType,
+      type: UserLoginType,
       args: {
         email: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: new GraphQLNonNull(GraphQLString) }
       },
-      resolve(parent, args) {
-        const user = User.find({ email: args.email });
+      async resolve(parent, args) {
+        const user = await User.find({ email: args.email });
+        const { id, name, email, country, jobless } = user[0];
         if (!user) {
           throw new Error("Could not find user");
         }
-        const valid = compare(args.password, user.password);
+        const valid = await compare(args.password, user[0].password);
         if (!valid) {
           throw new Error("Password invalid");
+        } else {
+          //login successfull
+          const userData = {
+            id,
+            name,
+            email,
+            country,
+            jobless,
+            token: toJWT({ id: user.id })
+          };
+          return userData;
         }
-        //login successfull
-        return {
-          accessToken: ""
-        };
       }
     },
     addJob: {
