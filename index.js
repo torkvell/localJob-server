@@ -9,7 +9,7 @@ dotenv.config();
 const cors = require("cors");
 
 //allow cross origin req
-app.use(cors);
+app.use(cors());
 
 //connect to mongo database
 mongoose.connect(
@@ -19,6 +19,7 @@ mongoose.connect(
     useUnifiedTopology: true
   }
 );
+
 mongoose.connection.once("open", () => {
   console.log("connected to mongo database");
 });
