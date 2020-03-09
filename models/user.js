@@ -6,9 +6,6 @@ const userSchema = new Schema({
   email: String,
   password: String,
   country: String,
-  city: String,
-  postalCode: String,
-  address: String,
   jobless: Boolean
 });
 

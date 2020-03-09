@@ -3,6 +3,9 @@ const User = require("../models/user");
 const Message = require("../models/message");
 const JobCategory = require("../models/jobCategory");
 const Job = require("../models/job");
+const { compare } = require("bcrypt");
+const bcrypt = require("bcrypt");
+const { toJWT } = require("../auth/jwt");
 
 const {
   GraphQLObjectType,
@@ -41,6 +44,18 @@ const UserType = new GraphQLObjectType({
   })
 });
 
+const UserLoginType = new GraphQLObjectType({
+  name: "UserLogin",
+  fields: () => ({
+    id: { type: GraphQLID },
+    name: { type: GraphQLString },
+    email: { type: GraphQLString },
+    country: { type: GraphQLString },
+    jobless: { type: GraphQLString },
+    token: { type: GraphQLString }
+  })
+});
+
 const JobType = new GraphQLObjectType({
   name: "Job",
   fields: () => ({
@@ -54,6 +69,10 @@ const JobType = new GraphQLObjectType({
     postalCode: { type: GraphQLString },
     address: { type: GraphQLString },
     userId: { type: GraphQLID },
+    country: { type: GraphQLString },
+    city: { type: GraphQLString },
+    postalCode: { type: GraphQLString },
+    address: { type: GraphQLString },
     jobCategoryId: { type: GraphQLID },
     jobCategory: {
       type: JobCategoryType,
@@ -127,15 +146,49 @@ const Mutations = new GraphQLObjectType({
         jobless: { type: new GraphQLNonNull(GraphQLBoolean) }
       },
       resolve(parent, args) {
-        let user = new User({
-          name: args.name,
-          email: args.email,
-          country: args.country,
-          password: args.password,
-          jobless: args.jobless
+        const saltRounds = 10;
+        bcrypt.hash(args.password, saltRounds).then(hashedPassword => {
+          // Store hash in your password DB.
+          console.log(hashedPassword);
+          let user = new User({
+            name: args.name,
+            email: args.email,
+            password: hashedPassword,
+            country: args.country,
+            jobless: args.jobless
+          });
+          //done by mongoose
+          return user.save();
         });
-        //done by mongoose
-        return user.save();
+      }
+    },
+    login: {
+      type: UserLoginType,
+      args: {
+        email: { type: new GraphQLNonNull(GraphQLString) },
+        password: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      async resolve(parent, args) {
+        const user = await User.find({ email: args.email });
+        const { id, name, email, country, jobless } = user[0];
+        if (!user) {
+          throw new Error("Could not find user");
+        }
+        const valid = await compare(args.password, user[0].password);
+        if (!valid) {
+          throw new Error("Password invalid");
+        } else {
+          //login successfull
+          const userData = {
+            id,
+            name,
+            email,
+            country,
+            jobless,
+            token: toJWT({ id: user.id })
+          };
+          return userData;
+        }
       }
     },
     addJob: {
