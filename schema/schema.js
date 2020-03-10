@@ -148,8 +148,7 @@ const Mutations = new GraphQLObjectType({
       resolve(parent, args) {
         const saltRounds = 10;
         bcrypt.hash(args.password, saltRounds).then(hashedPassword => {
-          // Store hash in your password DB.
-          console.log(hashedPassword);
+          //TODO: Check user input data before insertion to DB
           let user = new User({
             name: args.name,
             email: args.email,
@@ -157,7 +156,7 @@ const Mutations = new GraphQLObjectType({
             country: args.country,
             jobless: args.jobless
           });
-          //done by mongoose
+          //save into DB with mongoose
           return user.save();
         });
       }
@@ -173,7 +172,6 @@ const Mutations = new GraphQLObjectType({
         if (user.length < 1) {
           throw new Error("Could not find user");
         } else {
-          console.log(`server user`, user);
           const { id, name, email, country, jobless } = user[0];
           const valid = await compare(args.password, user[0].password);
           if (!valid) {
@@ -188,7 +186,6 @@ const Mutations = new GraphQLObjectType({
               jobless,
               token: toJWT({ id: user.id })
             };
-            console.log(userData);
             return userData;
           }
         }
