@@ -170,24 +170,27 @@ const Mutations = new GraphQLObjectType({
       },
       async resolve(parent, args) {
         const user = await User.find({ email: args.email });
-        const { id, name, email, country, jobless } = user[0];
-        if (!user) {
+        if (user.length < 1) {
           throw new Error("Could not find user");
-        }
-        const valid = await compare(args.password, user[0].password);
-        if (!valid) {
-          throw new Error("Password invalid");
         } else {
-          //login successfull
-          const userData = {
-            id,
-            name,
-            email,
-            country,
-            jobless,
-            token: toJWT({ id: user.id })
-          };
-          return userData;
+          console.log(`server user`, user);
+          const { id, name, email, country, jobless } = user[0];
+          const valid = await compare(args.password, user[0].password);
+          if (!valid) {
+            throw new Error("Password invalid");
+          } else {
+            //login successfull
+            const userData = {
+              id,
+              name,
+              email,
+              country,
+              jobless,
+              token: toJWT({ id: user.id })
+            };
+            console.log(userData);
+            return userData;
+          }
         }
       }
     },
