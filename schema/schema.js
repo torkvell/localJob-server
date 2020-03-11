@@ -149,6 +149,7 @@ const Mutations = new GraphQLObjectType({
         const saltRounds = 10;
         bcrypt.hash(args.password, saltRounds).then(hashedPassword => {
           //TODO: Check user input data before insertion to DB
+          //country has to match DB country and email has to be unique
           let user = new User({
             name: args.name,
             email: args.email,
