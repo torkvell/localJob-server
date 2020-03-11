@@ -1,7 +1,7 @@
 Main user stories:
 
-- As a private person I want to find local help with small work tasks quickly and efficient.
 - As a jobless person I would like to easily and quickly find jobs in my area.
+- As a private person I want to get help with small work tasks.
 
 Detailed user stories:
 
