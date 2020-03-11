@@ -7,6 +7,10 @@ const jobSchema = new Schema({
   price: Number,
   pictures: String,
   userId: String,
+  country: String,
+  city: String,
+  postalCode: String,
+  address: String,
   jobCategoryId: String
 });
 
