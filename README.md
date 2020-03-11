@@ -1,6 +1,6 @@
 Main user stories:
 
-- As a jobless person I would like to easily and quickly find jobs in my area.
+- As jobless I would like to easily and quickly find jobs in my area.
 - As a helper I want to pay to get small work tasks done.
 
 Detailed user stories:
