@@ -6,6 +6,7 @@ const Job = require("../models/job");
 const { compare } = require("bcrypt");
 const bcrypt = require("bcrypt");
 const { toJWT } = require("../auth/jwt");
+const { GraphQLUpload } = require("graphql-upload");
 
 const {
   GraphQLObjectType,
@@ -56,6 +57,30 @@ const UserLoginType = new GraphQLObjectType({
   })
 });
 
+// const JobType = new GraphQLObjectType({
+//   name: "Job",
+//   fields: () => ({
+//     id: { type: GraphQLID },
+//     title: { type: GraphQLString },
+//     description: { type: GraphQLString },
+//     price: { type: GraphQLInt },
+//     pictures: { type: GraphQLUpload },
+//     country: { type: GraphQLString },
+//     city: { type: GraphQLString },
+//     postalCode: { type: GraphQLString },
+//     address: { type: GraphQLString },
+//     userId: { type: GraphQLID },
+//     jobCategoryId: { type: GraphQLID }
+//     // jobCategory: {
+//     //   type: JobCategoryType,
+//     //   resolve(parent, args) {
+//     //     //get job category name
+//     //     return JobCategory.findById(parent.jobCategoryId);
+//     //   }
+//     // }
+//   })
+// });
+
 const JobType = new GraphQLObjectType({
   name: "Job",
   fields: () => ({
@@ -63,24 +88,13 @@ const JobType = new GraphQLObjectType({
     title: { type: GraphQLString },
     description: { type: GraphQLString },
     price: { type: GraphQLInt },
-    pictures: { type: GraphQLString },
+    images: { type: GraphQLUpload },
     country: { type: GraphQLString },
     city: { type: GraphQLString },
     postalCode: { type: GraphQLString },
     address: { type: GraphQLString },
-    userId: { type: GraphQLID },
-    country: { type: GraphQLString },
-    city: { type: GraphQLString },
-    postalCode: { type: GraphQLString },
-    address: { type: GraphQLString },
-    jobCategoryId: { type: GraphQLID },
-    jobCategory: {
-      type: JobCategoryType,
-      resolve(parent, args) {
-        //get job category name
-        return JobCategory.findById(parent.jobCategoryId);
-      }
-    }
+    userId: { type: GraphQLString },
+    jobCategoryId: { type: GraphQLString }
   })
 });
 
@@ -198,29 +212,40 @@ const Mutations = new GraphQLObjectType({
         title: { type: new GraphQLNonNull(GraphQLString) },
         description: { type: new GraphQLNonNull(GraphQLString) },
         price: { type: new GraphQLNonNull(GraphQLInt) },
-        pictures: { type: GraphQLString },
+        images: { type: new GraphQLNonNull(GraphQLUpload) },
         country: { type: new GraphQLNonNull(GraphQLString) },
         city: { type: new GraphQLNonNull(GraphQLString) },
         postalCode: { type: new GraphQLNonNull(GraphQLString) },
         address: { type: new GraphQLNonNull(GraphQLString) },
-        userId: { type: new GraphQLNonNull(GraphQLID) },
-        jobCategoryId: { type: new GraphQLNonNull(GraphQLID) }
+        userId: { type: new GraphQLNonNull(GraphQLString) },
+        jobCategoryId: { type: new GraphQLNonNull(GraphQLString) }
       },
-      resolve(parent, args) {
-        let job = new Job({
-          title: args.title,
-          description: args.description,
-          price: args.price,
-          pictures: args.pictures,
-          country: args.country,
-          city: args.city,
-          postalCode: args.postalCode,
-          address: args.address,
-          userId: args.userId,
-          jobCategoryId: args.jobCategoryId
-        });
-        return job.save();
+      async resolve(parent, args) {
+        console.log(
+          `we are in resolver for add job mutation -------------------->`
+        );
+        return true;
+        // const { filename, mimetype, createReadStream } = await image;
+        // const stream = createReadStream();
+
+        // Promisify the stream and store the file, then…
+        // return true
       }
+      // resolve(parent, args) {
+      //   let job = new Job({
+      //     title: args.title,
+      //     description: args.description,
+      //     price: args.price,
+      //     pictures: args.pictures,
+      //     country: args.country,
+      //     city: args.city,
+      //     postalCode: args.postalCode,
+      //     address: args.address,
+      //     userId: args.userId,
+      //     jobCategoryId: args.jobCategoryId
+      //   });
+      //   return job.save();
+      // }
     },
     addMessage: {
       type: MessageType,

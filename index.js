@@ -7,9 +7,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 dotenv.config();
 const cors = require("cors");
-
-//allow cross origin req
-app.use(cors());
+const { graphqlUploadExpress } = require("graphql-upload");
 
 //connect to mongo database
 mongoose.connect(
@@ -19,13 +17,16 @@ mongoose.connect(
     useUnifiedTopology: true
   }
 );
-
 mongoose.connection.once("open", () => {
   console.log("connected to mongo database");
 });
 
+//allow cross origin req
+app.use(cors());
+
 app.use(
   "/graphql",
+  graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
   graphqlHTTP({
     schema,
     graphiql: true
@@ -35,7 +36,7 @@ app.use(
 app.listen(PORT, () => {
   const url = `http://localhost:${PORT}`;
   console.log(
-    `   GraphQL server started on:\n   ${url}\n\n`,
+    `   GraphQL API started on:\n   ${url}\n\n`,
     `➜ Open ${url}/graphiql to\n   start querying your API.\n\n`,
     `➜ Point your GraphQL client apps to\n   ${url}/graphql\n`,
     " ---------------------------------------\n"
