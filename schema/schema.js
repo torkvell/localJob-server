@@ -88,7 +88,7 @@ const JobType = new GraphQLObjectType({
     title: { type: GraphQLString },
     description: { type: GraphQLString },
     price: { type: GraphQLInt },
-    images: { type: GraphQLUpload },
+    // images: { type: GraphQLUpload },
     country: { type: GraphQLString },
     city: { type: GraphQLString },
     postalCode: { type: GraphQLString },
@@ -212,7 +212,7 @@ const Mutations = new GraphQLObjectType({
         title: { type: new GraphQLNonNull(GraphQLString) },
         description: { type: new GraphQLNonNull(GraphQLString) },
         price: { type: new GraphQLNonNull(GraphQLInt) },
-        images: { type: new GraphQLNonNull(GraphQLUpload) },
+        // images: { type: new GraphQLNonNull(GraphQLUpload) },
         country: { type: new GraphQLNonNull(GraphQLString) },
         city: { type: new GraphQLNonNull(GraphQLString) },
         postalCode: { type: new GraphQLNonNull(GraphQLString) },
@@ -220,32 +220,47 @@ const Mutations = new GraphQLObjectType({
         userId: { type: new GraphQLNonNull(GraphQLString) },
         jobCategoryId: { type: new GraphQLNonNull(GraphQLString) }
       },
-      async resolve(parent, args) {
-        console.log(
-          `we are in resolver for add job mutation -------------------->`
-        );
-        return true;
+      async resolve(_, args) {
         // const { filename, mimetype, createReadStream } = await image;
         // const stream = createReadStream();
-
-        // Promisify the stream and store the file, then…
-        // return true
+        // Promisify the stream and store the image
+        const {
+          title,
+          description,
+          price,
+          country,
+          city,
+          postalCode,
+          address,
+          userId,
+          jobCategoryId
+        } = args;
+        console.log(
+          `we are in resolver for add job mutation -------------------->
+          \n ${title}
+          \n ${description}
+          \n ${price}
+          \n ${country}
+          \n ${city}
+          \n ${postalCode}
+          \n ${address}
+          \n ${userId}
+          \n ${jobCategoryId}`
+        );
+        //Save to db and return saved job to client
+        const job = new Job({
+          title,
+          description,
+          price,
+          country,
+          city,
+          postalCode,
+          address,
+          userId,
+          jobCategoryId
+        });
+        return job.save();
       }
-      // resolve(parent, args) {
-      //   let job = new Job({
-      //     title: args.title,
-      //     description: args.description,
-      //     price: args.price,
-      //     pictures: args.pictures,
-      //     country: args.country,
-      //     city: args.city,
-      //     postalCode: args.postalCode,
-      //     address: args.address,
-      //     userId: args.userId,
-      //     jobCategoryId: args.jobCategoryId
-      //   });
-      //   return job.save();
-      // }
     },
     addMessage: {
       type: MessageType,

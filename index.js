@@ -26,7 +26,7 @@ app.use(cors());
 
 app.use(
   "/graphql",
-  graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }),
+  graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }),
   graphqlHTTP({
     schema,
     graphiql: true
