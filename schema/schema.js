@@ -19,6 +19,8 @@ const {
   GraphQLNonNull
 } = graphql;
 
+/**---------------->Object Types<---------------- */
+
 const UserType = new GraphQLObjectType({
   name: "User",
   fields: () => ({
@@ -28,6 +30,7 @@ const UserType = new GraphQLObjectType({
     password: { type: GraphQLString },
     country: { type: GraphQLString },
     jobless: { type: GraphQLBoolean },
+    token: { type: GraphQLString },
     jobs: {
       type: new GraphQLList(JobType),
       resolve(parent, args) {
@@ -45,42 +48,6 @@ const UserType = new GraphQLObjectType({
   })
 });
 
-const UserLoginType = new GraphQLObjectType({
-  name: "UserLogin",
-  fields: () => ({
-    id: { type: GraphQLID },
-    name: { type: GraphQLString },
-    email: { type: GraphQLString },
-    country: { type: GraphQLString },
-    jobless: { type: GraphQLString },
-    token: { type: GraphQLString }
-  })
-});
-
-// const JobType = new GraphQLObjectType({
-//   name: "Job",
-//   fields: () => ({
-//     id: { type: GraphQLID },
-//     title: { type: GraphQLString },
-//     description: { type: GraphQLString },
-//     price: { type: GraphQLInt },
-//     pictures: { type: GraphQLUpload },
-//     country: { type: GraphQLString },
-//     city: { type: GraphQLString },
-//     postalCode: { type: GraphQLString },
-//     address: { type: GraphQLString },
-//     userId: { type: GraphQLID },
-//     jobCategoryId: { type: GraphQLID }
-//     // jobCategory: {
-//     //   type: JobCategoryType,
-//     //   resolve(parent, args) {
-//     //     //get job category name
-//     //     return JobCategory.findById(parent.jobCategoryId);
-//     //   }
-//     // }
-//   })
-// });
-
 const JobType = new GraphQLObjectType({
   name: "Job",
   fields: () => ({
@@ -94,7 +61,14 @@ const JobType = new GraphQLObjectType({
     postalCode: { type: GraphQLString },
     address: { type: GraphQLString },
     userId: { type: GraphQLString },
-    jobCategoryId: { type: GraphQLString }
+    jobCategoryId: { type: GraphQLString },
+    jobCategory: {
+      type: JobCategoryType,
+      resolve(parent, args) {
+        //get job category name
+        return JobCategory.findById(parent.jobCategoryId);
+      }
+    }
   })
 });
 
@@ -116,6 +90,8 @@ const MessageType = new GraphQLObjectType({
     jobId: { type: GraphQLID }
   })
 });
+
+/**---------------->Query Types<---------------- */
 
 const RootQuery = new GraphQLObjectType({
   name: "RootqueryType",
@@ -147,6 +123,8 @@ const RootQuery = new GraphQLObjectType({
   }
 });
 
+/**---------------->Mutation Types<---------------- */
+
 const Mutations = new GraphQLObjectType({
   name: "Mutation",
   fields: {
@@ -177,7 +155,7 @@ const Mutations = new GraphQLObjectType({
       }
     },
     login: {
-      type: UserLoginType,
+      type: UserType,
       args: {
         email: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: new GraphQLNonNull(GraphQLString) }
@@ -235,18 +213,18 @@ const Mutations = new GraphQLObjectType({
           userId,
           jobCategoryId
         } = args;
-        console.log(
-          `we are in resolver for add job mutation -------------------->
-          \n ${title}
-          \n ${description}
-          \n ${price}
-          \n ${country}
-          \n ${city}
-          \n ${postalCode}
-          \n ${address}
-          \n ${userId}
-          \n ${jobCategoryId}`
-        );
+        // console.log(
+        //   `we are in resolver for add job mutation -------------------->
+        //   \n ${title}
+        //   \n ${description}
+        //   \n ${price}
+        //   \n ${country}
+        //   \n ${city}
+        //   \n ${postalCode}
+        //   \n ${address}
+        //   \n ${userId}
+        //   \n ${jobCategoryId}`
+        // );
         //Save to db and return saved job to client
         const job = new Job({
           title,
