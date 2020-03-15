@@ -196,12 +196,15 @@ const Mutations = new GraphQLObjectType({
         postalCode: { type: new GraphQLNonNull(GraphQLString) },
         address: { type: new GraphQLNonNull(GraphQLString) },
         userId: { type: new GraphQLNonNull(GraphQLString) },
-        jobCategoryId: { type: new GraphQLNonNull(GraphQLString) }
+        jobCategoryId: { type: new GraphQLNonNull(GraphQLString) },
+        token: { type: new GraphQLNonNull(GraphQLString) }
       },
       async resolve(_, args) {
+        // TODO: Add functionality to save job images to server
         // const { filename, mimetype, createReadStream } = await image;
         // const stream = createReadStream();
         // Promisify the stream and store the image
+        // TODO: Implement authorization from user token before saving job to db
         const {
           title,
           description,
@@ -211,20 +214,22 @@ const Mutations = new GraphQLObjectType({
           postalCode,
           address,
           userId,
-          jobCategoryId
+          jobCategoryId,
+          token
         } = args;
-        // console.log(
-        //   `we are in resolver for add job mutation -------------------->
-        //   \n ${title}
-        //   \n ${description}
-        //   \n ${price}
-        //   \n ${country}
-        //   \n ${city}
-        //   \n ${postalCode}
-        //   \n ${address}
-        //   \n ${userId}
-        //   \n ${jobCategoryId}`
-        // );
+        console.log(
+          `we are in resolver for add job mutation -------------------->
+          \n ${title}
+          \n ${description}
+          \n ${price}
+          \n ${country}
+          \n ${city}
+          \n ${postalCode}
+          \n ${address}
+          \n ${userId}
+          \n ${jobCategoryId}
+          \n ${token}`
+        );
         //Save to db and return saved job to client
         const job = new Job({
           title,
