@@ -161,12 +161,12 @@ const Mutations = new GraphQLObjectType({
         password: { type: new GraphQLNonNull(GraphQLString) }
       },
       async resolve(parent, args) {
-        const user = await User.find({ email: args.email });
-        if (user.length < 1) {
+        const user = await User.findOne({ email: args.email });
+        if (!user) {
           throw new Error("Could not find user");
         } else {
-          const { id, name, email, country, jobless } = user[0];
-          const valid = await compare(args.password, user[0].password);
+          const { id, name, email, country, jobless } = user;
+          const valid = await compare(args.password, user.password);
           if (!valid) {
             throw new Error("Password invalid");
           } else {
@@ -201,9 +201,6 @@ const Mutations = new GraphQLObjectType({
       },
       async resolve(_, args) {
         // TODO: Add functionality to save job images to server
-        // const { filename, mimetype, createReadStream } = await image;
-        // const stream = createReadStream();
-        // Promisify the stream and store the image
         // TODO: Implement authorization from user token before saving job to db
         const {
           title,
