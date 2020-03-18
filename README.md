@@ -1,3 +1,5 @@
+Client code with TypeScript, React Native, Apollo and Redux can be found here: https://github.com/torkvell/JobLess-client
+
 Main user stories:
 
 - As a jobless user I would like to easily and quickly find jobs in my area.
