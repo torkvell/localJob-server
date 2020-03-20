@@ -1,5 +1,7 @@
 ## Welcome to JobLess!
 
+This project was build in a few weeks as a means to learn new technology. Development is a never ending process, a lof of features still has to be built. The idea of this project is to build a platform for jobless people to find small work tasks in their area. At the same time also provide a platform for private people/helpers to post small work tasks that can pay the jobless people.
+
 ## Client code
 
 https://github.com/torkvell/JobLess-client
