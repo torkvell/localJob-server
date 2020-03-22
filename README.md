@@ -12,6 +12,7 @@ This project was build in a few weeks as a means to learn new technology. Develo
 * [Navigation](#navigation)
   * [Non-authorized](#non-authorized)
   * [Authorized](#authorized)
+* [Demo](#demo)
 
 ## Client code
 
@@ -47,3 +48,8 @@ https://github.com/torkvell/JobLess-client
 ### Authorized
 
 ![navigation-signedOut](https://github.com/torkvell/JobLess-client/blob/master/src/assets/navigation-loggedIn.png) 
+
+## Demo
+
+[![Youtube video demo for JobLess](https://github.com/torkvell/JobLess-client/blob/master/src/assets/youtube-image-jobless.png)](https://youtu.be/7OBgyEOioFo)
+
