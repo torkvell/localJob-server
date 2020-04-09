@@ -51,5 +51,5 @@ https://github.com/torkvell/JobLess-client
 
 ## Demo
 
-[![Youtube video demo for JobLess](https://github.com/torkvell/JobLess-client/blob/master/src/assets/youtube-image-jobless.png)](https://youtu.be/7OBgyEOioFo)
+[![Youtube video demo for JobLess](https://github.com/torkvell/JobLess-client/blob/master/src/assets/youtube-image-jobless.png)](https://www.youtube.com/watch?v=YfPgOnXT1bs)
 
