@@ -5,7 +5,7 @@ const jobSchema = new Schema({
   title: String,
   description: String,
   price: Number,
-  pictures: Array,
+  images: Array,
   userId: String,
   country: String,
   city: String,

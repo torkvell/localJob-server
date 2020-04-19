@@ -209,7 +209,10 @@ const Mutations = new GraphQLObjectType({
           createReadStream().pipe(
             createWriteStream(path.join(__dirname, "../images", newFileName))
           );
-          return newFileName;
+          return (
+            "/Users/toralf/codaisseur/jobLess/jobLess-server/images/" +
+            newFileName
+          );
         };
 
         const getData = async () => {
@@ -233,7 +236,7 @@ const Mutations = new GraphQLObjectType({
           title,
           description,
           price,
-          pictures: pathNames,
+          images: pathNames,
           country,
           city,
           postalCode,
@@ -241,6 +244,7 @@ const Mutations = new GraphQLObjectType({
           userId,
           jobCategoryId,
         });
+        console.log("job: ", job);
         return job.save();
       },
     },
