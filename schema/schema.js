@@ -237,7 +237,7 @@ const Mutations = new GraphQLObjectType({
           title,
           description,
           price,
-          images: pathNames,
+          imagePaths: pathNames.toString(),
           country,
           city,
           postalCode,
@@ -249,7 +249,7 @@ const Mutations = new GraphQLObjectType({
           //TODO: Get job id from db
           return {
             ...res._doc,
-            imagePaths: res.images.toString(),
+            imagePaths: res.imagePaths.toString(),
             id: Date.now(),
           };
         });
