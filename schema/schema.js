@@ -192,7 +192,7 @@ const Mutations = new GraphQLObjectType({
         title: { type: new GraphQLNonNull(GraphQLString) },
         description: { type: new GraphQLNonNull(GraphQLString) },
         price: { type: new GraphQLNonNull(GraphQLInt) },
-        images: { type: GraphQLUpload },
+        images: { type: new GraphQLList(GraphQLUpload) },
         country: { type: new GraphQLNonNull(GraphQLString) },
         city: { type: new GraphQLNonNull(GraphQLString) },
         postalCode: { type: new GraphQLNonNull(GraphQLString) },
@@ -201,21 +201,21 @@ const Mutations = new GraphQLObjectType({
         jobCategoryId: { type: new GraphQLNonNull(GraphQLString) },
         token: { type: new GraphQLNonNull(GraphQLString) },
       },
+      // TODO: Implement authorization from user token before saving job to db
       async resolve(_, { images, ...args }) {
-        // TODO: Implement authorization from user token before saving job to db
-        const { createReadStream, filename } = await images;
-        const newFileName = Date.now() + filename;
-        const pathName =
-          "/Users/toralf/codaisseur/jobLess/jobLess-server/images" +
-          newFileName;
-        console.log("pathname: ", pathName);
-        await new Promise((res) =>
-          createReadStream()
-            .pipe(
-              createWriteStream(path.join(__dirname, "../images", newFileName))
-            )
-            .on("close", res)
-        );
+        const storeImages = async (image) => {
+          const { createReadStream, filename } = await image;
+          const newFileName = Date.now() + filename;
+          createReadStream().pipe(
+            createWriteStream(path.join(__dirname, "../images", newFileName))
+          );
+          return newFileName;
+        };
+
+        const getData = async () => {
+          return Promise.all(images.map((image) => storeImages(image)));
+        };
+        const pathNames = await getData();
         const {
           title,
           description,
@@ -228,27 +228,12 @@ const Mutations = new GraphQLObjectType({
           jobCategoryId,
           token,
         } = args;
-        console.log(
-          `we are in resolver for add job mutation -------------------->
-          \n ${title}
-          \n ${description}
-          \n ${price}
-          \n ${country}
-          \n ${city}
-          \n ${postalCode}
-          \n ${address}
-          \n ${userId}
-          \n ${pathName}
-          \n ${jobCategoryId}
-          \n ${token}`
-        );
-        const pictures = pathName;
         //Save to db and return saved job to client
         const job = new Job({
           title,
           description,
           price,
-          pictures,
+          pictures: pathNames,
           country,
           city,
           postalCode,
