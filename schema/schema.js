@@ -7,6 +7,8 @@ const { compare } = require("bcrypt");
 const bcrypt = require("bcrypt");
 const { toJWT } = require("../auth/jwt");
 const { GraphQLUpload } = require("graphql-upload");
+const { createWriteStream } = require("fs");
+const path = require("path");
 
 const {
   GraphQLObjectType,
@@ -16,7 +18,7 @@ const {
   GraphQLSchema,
   GraphQLInt,
   GraphQLList,
-  GraphQLNonNull
+  GraphQLNonNull,
 } = graphql;
 
 /**---------------->Object Types<---------------- */
@@ -36,16 +38,16 @@ const UserType = new GraphQLObjectType({
       resolve(parent, args) {
         //get all jobs for specific user id
         return Job.find({ userId: parent.id });
-      }
+      },
     },
     messages: {
       type: new GraphQLList(MessageType),
       resolve(parent, args) {
         //chatThreads has to contain: job title, price and id, user name and id from company, messages with dates
         return Message.find({ toUserId: parent.id });
-      }
-    }
-  })
+      },
+    },
+  }),
 });
 
 const JobType = new GraphQLObjectType({
@@ -55,7 +57,7 @@ const JobType = new GraphQLObjectType({
     title: { type: GraphQLString },
     description: { type: GraphQLString },
     price: { type: GraphQLInt },
-    // images: { type: GraphQLUpload },
+    images: { type: GraphQLUpload },
     country: { type: GraphQLString },
     city: { type: GraphQLString },
     postalCode: { type: GraphQLString },
@@ -67,17 +69,17 @@ const JobType = new GraphQLObjectType({
       resolve(parent, args) {
         //get job category name
         return JobCategory.findById(parent.jobCategoryId);
-      }
-    }
-  })
+      },
+    },
+  }),
 });
 
 const JobCategoryType = new GraphQLObjectType({
   name: "JobCategory",
   fields: () => ({
     id: { type: GraphQLID },
-    name: { type: GraphQLString }
-  })
+    name: { type: GraphQLString },
+  }),
 });
 
 const MessageType = new GraphQLObjectType({
@@ -87,8 +89,8 @@ const MessageType = new GraphQLObjectType({
     message: { type: GraphQLString },
     toUserId: { type: GraphQLID },
     fromUserId: { type: GraphQLID },
-    jobId: { type: GraphQLID }
-  })
+    jobId: { type: GraphQLID },
+  }),
 });
 
 /**---------------->Query Types<---------------- */
@@ -102,7 +104,7 @@ const RootQuery = new GraphQLObjectType({
       resolve(parent, args) {
         //get a user with a specific id
         return User.findById(args.id);
-      }
+      },
     },
     job: {
       type: JobType,
@@ -110,7 +112,7 @@ const RootQuery = new GraphQLObjectType({
       resolve(parent, args) {
         //get a job with a specific id
         return Job.findById(args.id);
-      }
+      },
     },
     userJobs: {
       type: GraphQLList(JobType),
@@ -118,9 +120,9 @@ const RootQuery = new GraphQLObjectType({
       resolve(parent, args) {
         //get all jobs for a specific user here
         return Job.find({ userId: args.userId });
-      }
-    }
-  }
+      },
+    },
+  },
 });
 
 /**---------------->Mutation Types<---------------- */
@@ -135,11 +137,11 @@ const Mutations = new GraphQLObjectType({
         email: { type: new GraphQLNonNull(GraphQLString) },
         password: { type: new GraphQLNonNull(GraphQLString) },
         country: { type: new GraphQLNonNull(GraphQLString) },
-        jobless: { type: new GraphQLNonNull(GraphQLBoolean) }
+        jobless: { type: new GraphQLNonNull(GraphQLBoolean) },
       },
       resolve(parent, args) {
         const saltRounds = 10;
-        bcrypt.hash(args.password, saltRounds).then(hashedPassword => {
+        bcrypt.hash(args.password, saltRounds).then((hashedPassword) => {
           //TODO: Check user input data before insertion to DB
           //country has to match DB country and email has to be unique
           let user = new User({
@@ -147,18 +149,18 @@ const Mutations = new GraphQLObjectType({
             email: args.email,
             password: hashedPassword,
             country: args.country,
-            jobless: args.jobless
+            jobless: args.jobless,
           });
           //save into DB with mongoose
           return user.save();
         });
-      }
+      },
     },
     login: {
       type: UserType,
       args: {
         email: { type: new GraphQLNonNull(GraphQLString) },
-        password: { type: new GraphQLNonNull(GraphQLString) }
+        password: { type: new GraphQLNonNull(GraphQLString) },
       },
       async resolve(parent, args) {
         const user = await User.findOne({ email: args.email });
@@ -177,12 +179,12 @@ const Mutations = new GraphQLObjectType({
               email,
               country,
               jobless,
-              token: toJWT({ id: user.id })
+              token: toJWT({ id: user.id }),
             };
             return userData;
           }
         }
-      }
+      },
     },
     addJob: {
       type: JobType,
@@ -190,18 +192,33 @@ const Mutations = new GraphQLObjectType({
         title: { type: new GraphQLNonNull(GraphQLString) },
         description: { type: new GraphQLNonNull(GraphQLString) },
         price: { type: new GraphQLNonNull(GraphQLInt) },
-        // images: { type: new GraphQLNonNull(GraphQLUpload) },
+        images: { type: new GraphQLList(GraphQLUpload) },
         country: { type: new GraphQLNonNull(GraphQLString) },
         city: { type: new GraphQLNonNull(GraphQLString) },
         postalCode: { type: new GraphQLNonNull(GraphQLString) },
         address: { type: new GraphQLNonNull(GraphQLString) },
         userId: { type: new GraphQLNonNull(GraphQLString) },
         jobCategoryId: { type: new GraphQLNonNull(GraphQLString) },
-        token: { type: new GraphQLNonNull(GraphQLString) }
+        token: { type: new GraphQLNonNull(GraphQLString) },
       },
-      async resolve(_, args) {
-        // TODO: Add functionality to save job images to server
-        // TODO: Implement authorization from user token before saving job to db
+      // TODO: Implement authorization from user token before saving job to db
+      async resolve(_, { images, ...args }) {
+        const storeImages = async (image) => {
+          const { createReadStream, filename } = await image;
+          const newFileName = Date.now() + filename;
+          createReadStream().pipe(
+            createWriteStream(path.join(__dirname, "../images", newFileName))
+          );
+          return (
+            "/Users/toralf/codaisseur/jobLess/jobLess-server/images/" +
+            newFileName
+          );
+        };
+
+        const getData = async () => {
+          return Promise.all(images.map((image) => storeImages(image)));
+        };
+        const pathNames = await getData();
         const {
           title,
           description,
@@ -212,35 +229,24 @@ const Mutations = new GraphQLObjectType({
           address,
           userId,
           jobCategoryId,
-          token
+          token,
         } = args;
-        console.log(
-          `we are in resolver for add job mutation -------------------->
-          \n ${title}
-          \n ${description}
-          \n ${price}
-          \n ${country}
-          \n ${city}
-          \n ${postalCode}
-          \n ${address}
-          \n ${userId}
-          \n ${jobCategoryId}
-          \n ${token}`
-        );
         //Save to db and return saved job to client
         const job = new Job({
           title,
           description,
           price,
+          images: pathNames,
           country,
           city,
           postalCode,
           address,
           userId,
-          jobCategoryId
+          jobCategoryId,
         });
+        console.log("job: ", job);
         return job.save();
-      }
+      },
     },
     addMessage: {
       type: MessageType,
@@ -248,34 +254,34 @@ const Mutations = new GraphQLObjectType({
         message: { type: new GraphQLNonNull(GraphQLString) },
         toUserId: { type: new GraphQLNonNull(GraphQLID) },
         fromUserId: { type: new GraphQLNonNull(GraphQLID) },
-        jobId: { type: new GraphQLNonNull(GraphQLID) }
+        jobId: { type: new GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
         let message = new Message({
           message: args.message,
           toUserId: args.toUserId,
           fromUserId: args.fromUserId,
-          jobId: args.jobId
+          jobId: args.jobId,
         });
         return message.save();
-      }
+      },
     },
     addJobCategory: {
       type: JobCategoryType,
       args: {
-        name: { type: GraphQLString }
+        name: { type: GraphQLString },
       },
       resolve(parent, args) {
         let jobCategory = new JobCategory({
-          name: args.name
+          name: args.name,
         });
         return jobCategory.save();
-      }
-    }
-  }
+      },
+    },
+  },
 });
 
 module.exports = new GraphQLSchema({
   query: RootQuery,
-  mutation: Mutations
+  mutation: Mutations,
 });
