@@ -71,7 +71,7 @@ const JobType = new GraphQLObjectType({
         return JobCategory.findById(parent.jobCategoryId);
       },
     },
-    token: { type: GraphQLString },
+    imagePaths: { type: GraphQLString },
   }),
 });
 
@@ -202,8 +202,20 @@ const Mutations = new GraphQLObjectType({
         jobCategoryId: { type: new GraphQLNonNull(GraphQLString) },
         token: { type: new GraphQLNonNull(GraphQLString) },
       },
-      // TODO: Implement authorization from user token before saving job to db
       async resolve(_, { images, ...args }) {
+        // TODO: Implement authorization from user token before saving job to db
+        const {
+          title,
+          description,
+          price,
+          country,
+          city,
+          postalCode,
+          address,
+          userId,
+          jobCategoryId,
+          token,
+        } = args;
         const storeImages = async (image) => {
           const { createReadStream, filename } = await image;
           const newFileName = Date.now() + filename;
@@ -220,19 +232,6 @@ const Mutations = new GraphQLObjectType({
           return Promise.all(images.map((image) => storeImages(image)));
         };
         const pathNames = await getData();
-        const {
-          title,
-          description,
-          price,
-          country,
-          city,
-          postalCode,
-          address,
-          userId,
-          jobCategoryId,
-          token,
-        } = args;
-        console.log("token----------->", token);
         //Save to db and return saved job to client
         const job = new Job({
           title,
@@ -246,13 +245,8 @@ const Mutations = new GraphQLObjectType({
           userId,
           jobCategoryId,
         });
-        console.log("job: ", job);
         return job.save().then((res) => {
-          console.log("response", res);
-          const newImages = res.images.toString();
-          const newRes = { ...res._doc, token: newImages };
-          console.log("new response-------->", newRes);
-          return newRes;
+          return { ...res._doc, imagePaths: res.images.toString() };
         });
       },
     },
