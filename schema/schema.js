@@ -71,6 +71,7 @@ const JobType = new GraphQLObjectType({
         return JobCategory.findById(parent.jobCategoryId);
       },
     },
+    token: { type: GraphQLString },
   }),
 });
 
@@ -231,6 +232,7 @@ const Mutations = new GraphQLObjectType({
           jobCategoryId,
           token,
         } = args;
+        console.log("token----------->", token);
         //Save to db and return saved job to client
         const job = new Job({
           title,
@@ -245,7 +247,13 @@ const Mutations = new GraphQLObjectType({
           jobCategoryId,
         });
         console.log("job: ", job);
-        return job.save();
+        return job.save().then((res) => {
+          console.log("response", res);
+          const newImages = res.images.toString();
+          const newRes = { ...res._doc, token: newImages };
+          console.log("new response-------->", newRes);
+          return newRes;
+        });
       },
     },
     addMessage: {
