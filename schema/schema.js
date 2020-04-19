@@ -246,7 +246,12 @@ const Mutations = new GraphQLObjectType({
           jobCategoryId,
         });
         return job.save().then((res) => {
-          return { ...res._doc, imagePaths: res.images.toString() };
+          //TODO: Get job id from db
+          return {
+            ...res._doc,
+            imagePaths: res.images.toString(),
+            id: Date.now(),
+          };
         });
       },
     },
