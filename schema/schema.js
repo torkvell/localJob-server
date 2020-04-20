@@ -115,6 +115,15 @@ const RootQuery = new GraphQLObjectType({
         return Job.findById(args.id);
       },
     },
+    jobs: {
+      type: new GraphQLList(JobType),
+      args: { country: { type: GraphQLString } },
+      async resolve(parent, args) {
+        console.log("args country", args.country);
+        const jobs = await Job.find({ country: args.country });
+        return jobs;
+      },
+    },
     userJobs: {
       type: GraphQLList(JobType),
       args: { userId: { type: GraphQLID } },
